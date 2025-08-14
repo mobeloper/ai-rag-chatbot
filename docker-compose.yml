@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  hrbot:
+    image: nestle-hr-assistant:latest
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      PORT: "8080"
+      INDEX_DIR: "faiss_index_nestle_hr_2012"
+      PDF_PATH: "the_nestle_hr_policy_pdf_2012.pdf"
+    volumes:
+      - ./faiss_index_nestle_hr_2012:/app/faiss_index_nestle_hr_2012
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# Node/build caches (just in case)
+node_modules/
+dist/
+
+# OS/editor
+.DS_Store
+
+# Local vector index (we’ll mount as a volume in dev)
+faiss_index_nestle_hr_2012/
