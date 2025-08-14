@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nestlé HR Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div class="max-w-3xl mx-auto px-4 py-8">
+    <header class="mb-6">
+      <h1 class="text-2xl font-bold">Nestlé HR Assistant</h1>
+      <p class="text-sm text-slate-600">Ask questions grounded in the 2012 Nestlé HR Policy PDF.</p>
+    </header>
+
+    <div id="chat" class="bg-white rounded-2xl shadow p-4 h-[70vh] overflow-y-auto space-y-4"></div>
+
+    <form id="form" class="mt-4 flex gap-2">
+      <input id="input" type="text" required
+             placeholder="e.g., What is the policy on equal opportunity?"
+             class="flex-1 rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <button class="rounded-xl px-5 py-3 bg-blue-600 text-white hover:bg-blue-700">Send</button>
+    </form>
+
+    <!-- Footer for the chatbot interface -->
+    <div class="p-2 text-center text-gray-500 text-sm shadow-inner">
+        <p>Created by: Eric Michel</p>
+        <a href="https://www.linkedin.com/in/ericmichelcv/" target="_blank" class="text-blue-600 hover:underline">Profile Page</a>
+    </div>
+  </div>
+
+  <script>
+    const chatEl = document.getElementById('chat');
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+
+    const history = []; // {role:"user"|"assistant", content:string}[]
+
+    function addBubble(role, text, sources=[]) {
+      const wrapper = document.createElement('div');
+      wrapper.className = role === 'user' ? 'flex justify-end' : 'flex justify-start';
+
+      const bubble = document.createElement('div');
+      bubble.className = (role === 'user'
+        ? 'bg-blue-600 text-white'
+        : 'bg-slate-100 text-slate-900') + ' max-w-[85%] rounded-2xl px-4 py-3';
+
+      const p = document.createElement('p');
+      p.className = 'whitespace-pre-wrap';
+      p.textContent = text;
+      bubble.appendChild(p);
+
+      if (sources && sources.length && role === 'assistant') {
+        const details = document.createElement('details');
+        details.className = 'mt-2';
+        const summary = document.createElement('summary');
+        summary.textContent = 'Sources';
+        details.appendChild(summary);
+
+        const ul = document.createElement('ul');
+        ul.className = 'text-sm list-disc ml-6 mt-1';
+        sources.forEach(s => {
+          const li = document.createElement('li');
+          li.textContent = `${s.source}, page ${s.page ?? "?"}: “${s.preview}...”`;
+          ul.appendChild(li);
+        });
+        details.appendChild(ul);
+        bubble.appendChild(details);
+      }
+
+      wrapper.appendChild(bubble);
+      chatEl.appendChild(wrapper);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      addBubble('user', msg);
+      history.push({ role: 'user', content: msg });
+      input.value = '';
+      addBubble('assistant', 'Thinking…');
+
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ message: msg, history })
+        });
+        const data = await res.json();
+        // Replace last assistant bubble
+        chatEl.lastChild.querySelector('p').textContent = data.answer || '(no answer)';
+        if (data.sources) {
+          const assistantBubble = chatEl.lastChild.querySelector('div');
+          assistantBubble && assistantBubble.remove(); // remove old bubble
+          addBubble('assistant', data.answer || '(no answer)', data.sources);
+        }
+        history.push({ role: 'assistant', content: data.answer || '' });
+      } catch (err) {
+        chatEl.lastChild.querySelector('p').textContent = 'Error: ' + (err?.message || err);
+      }
+    });
+
+    // Optional greeting
+    addBubble('assistant',
+      "Hello! I can answer questions about the Nestlé HR Policy (2012). Ask me about leave, benefits, equal opportunity, etc. I will cite page numbers.");
+  </script>
+</body>
+</html>
