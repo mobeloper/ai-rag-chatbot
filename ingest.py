@@ -35,11 +35,9 @@ def main():
     vectordb = FAISS.from_documents(docs, embeddings)
 
     # 4) Persist the index to disk
-    # We’re using save_local/load_local so you don’t re-embed every time you start the server.
+    # We’re using save_local/load_local to avoid re-embed every time the server starts.
     index_dir = "faiss_index_nestle_hr_2012"
     vectordb.save_local(index_dir)
-    
-    
     
     print(f"✅ Ingestion complete. Chunks: {len(docs)}. Index saved to: {index_dir}")
 
