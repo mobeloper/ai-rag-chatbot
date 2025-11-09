@@ -4,14 +4,14 @@
 # ai-rag-chatbot
 Chatbot using LLMs with RAG
 
+Environment & prerequisites:
+
+Requires: Python 3.10+
+
+API key: OPENAI_API_KEY (export via env or .env)
+
 Preview:
 ![AI RAG Chatbot App](https://github.com/mobeloper/ai-rag-chatbot/blob/main/NestleChatbot_EricMichel.png "AI RAG Chatbot App")
-
-
-
-Environment & prerequisites:
-Requires: Python 3.10+
-API key: OPENAI_API_KEY (export via env or .env)
 
 
 # Tools
@@ -49,7 +49,7 @@ These are enforced in answer_prompt. You can further add a “tone” line if yo
 
 # Run the code:
 
-Put the PDF at ./the_nestle_hr_policy_pdf_2012.pdf.
+Put the PDF at root (i.e. ./the_nestle_hr_policy_pdf_2012.pdf).
 
 python ingest.py (one-time, or whenever the document changes).
 
@@ -81,18 +81,6 @@ Q2: “How long is it for fathers?” (should use history)
 Edge cases: Ask about something not in the document; bot should politely say so.
 
 Latency: First request warms the model; subsequent answers should be fast (FAISS lookup is local).
-
-
-
-
-
-
-9) Why these specific tools?
-
-
-
-
-
 
 
 
