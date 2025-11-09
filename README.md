@@ -1,5 +1,12 @@
+
+
+
 # ai-rag-chatbot
 Chatbot using LLMs with RAG
+
+#Preview
+![AI RAG Chatbot App](https://github.com/mobeloper/ai-rag-chatbot/blob/main/NestleChatbot_EricMichel.png "AI RAG Chatbot App")
+
 
 
 Environment & prerequisites:
